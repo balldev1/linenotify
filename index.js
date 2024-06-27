@@ -10,12 +10,15 @@ const LINE_NOTIFY_TOKEN = process.env.LINE_NOTIFY_TOKEN;
 
 app.use(express.json());
 
-async function sendLineNotification(message) {
+async function sendLineNotification(form, sub) {
     try {
         const headers = {
             'Authorization': `Bearer ${LINE_NOTIFY_TOKEN}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         };
+
+        // รวม form และ sub เป็นข้อความเดียว
+        const message = `Form: ${form}, Subject: ${sub}`;
 
         const body = qs.stringify({ message });
 
@@ -30,11 +33,11 @@ async function sendLineNotification(message) {
 }
 
 app.post('/send-line-notification', async (req, res) => {
-    const { message } = req.body;
-    console.log({message});
+    const { form, sub } = req.body;
+    console.log({ form, sub });
 
     try {
-        const result = await sendLineNotification(message);
+        const result = await sendLineNotification(form, sub);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ error: 'Failed to send Line notification' });
@@ -44,7 +47,3 @@ app.post('/send-line-notification', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-// PORT=3000
-// NODE_ENV=development
-// LINE_NOTIFY_TOKEN=2gWb1cbc9PzO7sWgEtHT50UUHyFf2kh3HZA8PlqzeiF
